@@ -1,40 +1,36 @@
-# Azure Resource Diagnostic Settings Automation Script
+# Azure Log Analytics Workspace Enabler Script
 
-## Introduction
-This PowerShell script is designed to automate the process of configuring diagnostic settings for Azure resources. It ensures that all Azure resources within your subscriptions are correctly configured with Log Analytics Workspace (LAW) and Event Hub (EH) diagnostic settings.
+## Overview
+This PowerShell script is designed to enable Log Analytics Workspace (LAW) diagnostic settings across all resource types in Microsoft Azure subscriptions that are supported by diagnostic settings. It iterates over multiple subscriptions, enabling LAW for each supported resource while specifically excluding Azure Firewalls.
 
 ## Prerequisites
-- Azure PowerShell module: The script requires the Azure PowerShell module to be installed and available on the system where the script is run.
-- Azure Account: A user account with sufficient permissions to modify diagnostic settings across the Azure resources.
-- Log Analytics Workspace ID and Diagnostic Setting Name: These values need to be provided within the script.
-
-## Configuration
-Before running the script, configure the following variables within the script:
-- `$logAnalyticsWorkspaceId`: Your Log Analytics Workspace ID.
-- `$diagnosticSettingName`: Your preferred name for the diagnostic settings.
+- Azure PowerShell Module
+- Access to the Azure subscriptions you intend to configure
+- Log Analytics Workspace ID
 
 ## Usage
-To use this script, follow these steps:
-1. Open your PowerShell terminal.
-2. Ensure you are logged into your Azure account. If not, the script will prompt for login.
-3. Run the script.
+1. **Set Variables**: 
+   - `$logAnalyticsWorkspaceId`: Set this to your Log Analytics Workspace ID.
+   - `$diagnosticSettingName`: Name for the diagnostic setting to be applied.
+   - `$supportedResourceTypes`: Array containing all resource types that support diagnostic settings in Azure. Modify as needed.
 
-## How It Works
-1. **Conditional Login**: Checks if you are logged into Azure and prompts for login if not.
-2. **Subscription Handling**: Iterates through all Azure subscriptions accessible to your account.
-3. **Resource Processing**: For each subscription, it retrieves all resources and processes each one to check and set the diagnostic settings as follows:
-   - If a resource has Event Hub (EH) enabled and LAW disabled, it enables LAW.
-   - If a resource has both EH and LAW enabled, it removes the Event Hub Diagnostic settings.
-   - If a resource has LAW enabled and EH disabled, it leaves the resource as-is.
-4. **Error Handling**: In case of any failures in retrieving the diagnostic settings for a resource, it outputs a warning.
-5. **Tracking Changes**: All amended resources are tracked and reported at the end of processing each subscription.
+2. **Login to Azure**: 
+   The script checks if you are logged in and prompts for login if necessary.
 
-## Notes
-- The script outputs the status and actions taken for each resource in the console.
-- Ensure you have the necessary permissions before running the script to avoid access-related errors.
+3. **Run the Script**: 
+   Execute the script. It will loop through each subscription accessible to your account, apply diagnostic settings, and generate a report.
+
+## Script Behavior
+- The script sets the context to each subscription one by one and fetches all resources.
+- It checks each resource to see if it's a type that supports diagnostic settings and is not an Azure Firewall.
+- LAW diagnostic settings are applied to each supported resource.
+- If the setting application fails, the resource is recorded.
+- At the end of execution, the script provides a summary of all resources across subscriptions where LAW could not be enabled.
+
+## Important Notes
+- Ensure that the account used has the necessary permissions to modify resources across the subscriptions.
+- Review and update the list of supported resource types as per your organizational requirements.
+- The script includes error handling to continue execution even if some resources fail to update.
 
 ## Disclaimer
-This script is provided 'as is' and should be tested in a non-production environment before use. The author is not responsible for any unintended effects of this script.
-
-## Contribution
-Feedback and contributions to this script are welcome. Please submit your suggestions or improvements as pull requests or issues in the repository.
+This script is provided 'as-is' and should be tested in a non-production environment before use. The author is not responsible for any unintended consequences of using this script in your Azure environment.
